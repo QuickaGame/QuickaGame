@@ -1,40 +1,274 @@
-Crée une mini-application web appelée QuickaGame, destinée à Telegram.
-
-Je veux un design professionnel rouge et noir.
-
-L’application doit contenir :
-
-* Un écran d’accueil avec le nom QuickaGame.
-* Un bouton « Regarder une vidéo ».
-* Une durée de vidéo de 30 secondes.
-* Un portefeuille virtuel affichant les récompenses 
-* Une récompense de 50euros par vidéo validée.
-* Une limite de 15 vidéos par jour.
-* Un historique des récompenses.
-* Un compteur de solde.
-
-Ajoute au portefeuille QuickaGame :
-
-* Une rubrique IBAN virtuel fictif.
-* Un numéro de démonstration clairement non bancaire et non utilisable.
-* Un montant fictif affiché.
-* Un historique des récompenses.
-* Un bouton « Mon portefeuille ».
-
-IMPORTANT : aucun véritable compte bancaire, aucun virement et aucun retrait réel. Afficher clairement que toutes les sommes et coordonnées sont en attente 
-
-Ajoute un système de parrainage à QuickaGame.
-
-Fonctionnement :
-
-* Chaque utilisateur possède son propre lien de parrainage.
-* Il peut partager son lien avec ses amis sur Telegram.
-* Chaque nouvel utilisateur invité et inscrit rapporte 70 euros virtuelles au parrain.
-* Un même invité ne peut être comptabilisé qu’une seule fois.
-* Afficher le nombre d’amis invités.
-* Afficher le total des euros gagnées grâce au parrainage.
-* Ajouter un bouton « Inviter mes amis ».
-* Ajouter un bouton pour partager le lien Telegram.
 
 
-Prépare une application adaptée aux téléphones iPhone et à Telegram Mini Apps.
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>QuickaGame</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{margin:0;padding:20px;background:#100d0f;color:white;font-family:Arial}
+
+header{text-align:center;color:#ff303b;font-size:30px;font-weight:bold;padding:20px}
+
+.card{background:#211a1d;border:1px solid #54252c;border-radius:18px;padding:20px;margin:18px 0}
+
+button{background:#e92735;color:white;border:0;border-radius:12px;padding:15px;width:100%;font-size:16px;font-weight:bold;margin-top:12px}
+
+nav{display:flex;gap:7px}
+
+nav button{font-size:13px;padding:12px 5px}
+
+.balance{text-align:center;font-size:30px;color:#ffd15a;font-weight:bold;padding:15px}
+
+.small{font-size:12px;color:#aaa;line-height:1.6}
+
+#timer{text-align:center;font-size:35px;color:#ff3845;padding:15px}
+
+section[hidden]{display:none}
+
+</style>
+
+</head>
+
+<body>
+
+<header>🔴 QUICKAGAME 🎮</header>
+
+<p style="text-align:center">Bienvenue dans ton espace de jeu !</p>
+
+<nav>
+
+<button onclick="page('home')">Accueil</button>
+
+<button onclick="page('wallet')">Portefeuille</button>
+
+<button onclick="page('ref')">Parrainage</button>
+
+</nav>
+
+<section id="home">
+
+<div class="card">
+
+<h2>📺 Regarder une vidéo</h2>
+
+<p>Durée : 30 secondes</p>
+
+<p>Récompense fictive : 50 points</p>
+
+<p>Maximum : 15 vidéos par jour</p>
+
+<div id="timer">00:30</div>
+
+<button id="play" onclick="start()">▶ Regarder une vidéo</button>
+
+<p class="small">Démonstration uniquement : aucune publicité réelle n'est validée.</p>
+
+</div>
+
+<div class="card">
+
+<h2>👛 Mon solde</h2>
+
+<div class="balance" id="balance">0 points</div>
+
+<button onclick="page('wallet')">Mon portefeuille</button>
+
+</div>
+
+</section>
+
+<section id="wallet" hidden>
+
+<div class="card">
+
+<h2>👛 Mon portefeuille</h2>
+
+<div class="balance" id="walletBalance">0 points</div>
+
+<p>Identifiant fictif : DEMO-QUICKA-0000</p>
+
+<p>Montant fictif : 0,00 €</p>
+
+<p class="small">Aucun IBAN bancaire réel, virement ou retrait. Toutes les sommes sont fictives.</p>
+
+</div>
+
+<div class="card">
+
+<h2>📋 Historique</h2>
+
+<div id="history">Aucune récompense.</div>
+
+</div>
+
+</section>
+
+<section id="ref" hidden>
+
+<div class="card">
+
+<h2>🎁 Parrainage</h2>
+
+<div class="balance">+70 points</div>
+
+<p>Par nouvel invité éligible.</p>
+
+<p>Amis invités : 0</p>
+
+<p>Total parrainage : 0 points</p>
+
+<button onclick="invite()">📤 Inviter mes amis</button>
+
+</div>
+
+</section>
+
+<p class="small" style="text-align:center">QuickaGame — Prototype de démonstration. Points sans valeur monétaire réelle.</p>
+
+<script>
+
+const tg=window.Telegram?.WebApp;
+
+tg?.ready();
+
+tg?.expand();
+
+let balance=0;
+
+let count=0;
+
+function page(id){
+
+["home","wallet","ref"].forEach(x=>{
+
+document.getElementById(x).hidden=x!==id;
+
+});
+
+}
+
+function update(){
+
+document.getElementById("balance").textContent=balance+" points";
+
+document.getElementById("walletBalance").textContent=balance+" points";
+
+}
+
+function start(){
+
+if(count>=15){alert("Limite atteinte");return;}
+
+let s=30;
+
+let b=document.getElementById("play");
+
+b.disabled=true;
+
+let timer=setInterval(()=>{
+
+s--;
+
+document.getElementById("timer").textContent="00:"+String(s).padStart(2,"0");
+
+if(s<=0){
+
+clearInterval(timer);
+
+b.disabled=false;
+
+b.textContent="▶ Regarder une vidéo";
+
+document.getElementById("timer").textContent="Terminé";
+
+alert("Démonstration terminée. Aucune récompense réelle.");
+
+}
+
+},1000);
+
+}
+
+function invite(){
+
+let link="https://t.me/QuickaofficielBot?start=DEMO";
+
+if(navigator.share){
+
+navigator.share({title:"QuickaGame",text:"Découvre QuickaGame !",url:link});
+
+}else{
+
+prompt("Lien de démonstration :",link);
+
+}
+
+}
+
+update();
+
+</script>
+
+</body>
+
+</html>
+
+
+<section id="retrait" class="card">
+
+  <h2>💳 Retrait virtuel</h2>
+
+  <p>Mon solde disponible</p>
+
+  <div class="balance" id="soldeRetrait">0 points</div>
+
+  <p>IBAN de démonstration :</p>
+
+  <p class="gold">DEMO-QUICKA-0000</p>
+
+  <p>Montant fictif : 0,00 €</p>
+
+  <p class="small">
+
+    Espace de démonstration uniquement.
+
+    Aucune opération bancaire réelle.
+
+    Aucun virement ni retrait possible.
+
+  </p>
+
+  <button onclick="demandeRetrait()">
+
+    Demander un retrait fictif
+
+  </button>
+
+  <p id="statutRetrait" class="small"></p>
+
+</section>
+
+<script>
+
+function demandeRetrait(){
+
+ document.getElementById("statutRetrait").textContent =
+
+ "Demande fictive enregistrée : EN ATTENTE (démo).";
+
+}
+
+</script>
