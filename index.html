@@ -263,6 +263,52 @@ document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x
 document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));
 }));
 let running=false;
+let running = false;
+
+$('watchBtn').addEventListener('click', async () => {
+    if (running || videos >= 15) return;
+
+    if (typeof window.show_12336433 !== 'function') {
+        alert('Publicité indisponible. Réessaie plus tard.');
+        return;
+    }
+
+    running = true;
+    $('watchBtn').disabled = true;
+    $('watchBtn').textContent = 'Chargement de la publicité...';
+
+    try {
+        const ymid = 'qg_' + Date.now();
+
+        const result = await window.show_12336433({
+            ymid: ymid,
+            requestVar: 'quickagame_50_coins'
+        });
+
+        if (result?.reward_event_type === 'valued') {
+            videos++;
+            coins += 50;
+
+            localStorage.setItem('qg_demo_coins', coins);
+            localStorage.setItem('qg_demo_videos', videos);
+
+            alert('Bravo ! 50 pièces ajoutées !');
+            render();
+
+        } else {
+            alert('Publicité non rémunérée. Aucune pièce ajoutée.');
+        }
+
+    } catch (error) {
+        alert('La publicité est indisponible. Réessaie plus tard.');
+
+    } finally {
+        running = false;
+        $('watchBtn').disabled = videos >= 15;
+        $('watchBtn').textContent = '▶ Lancer la vidéo (30 s)';
+    }
+});
+
 $('watchBtn').addEventListener('click',()=>{
 if(running||videos>=15)return;
 running=true;
