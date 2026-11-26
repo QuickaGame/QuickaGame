@@ -1,0 +1,1441 @@
+
+
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<meta name="theme-color" content="#080b22">
+
+<title>QuickaGame</title>
+
+<style>
+
+:root {
+
+--bg:#07091b;
+
+--blue:#4d8dff;
+
+--violet:#a879ff;
+
+--muted:#aeb8df;
+
+--green:#75e2b0;
+
+--gold:#ffd66b;
+
+}
+
+* { box-sizing:border-box; }
+
+body {
+
+margin:0;
+
+color:white;
+
+background:
+
+radial-gradient(ellipse at 15% 0%,#1c3479 0,transparent 35%),
+
+radial-gradient(ellipse at 90% 18%,#49206f 0,transparent 34%),
+
+#07091b;
+
+font-family:system-ui,sans-serif;
+
+padding-bottom:94px;
+
+}
+
+header {
+
+position:sticky;
+
+top:0;
+
+z-index:8;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:13px 17px;
+
+background:#080b22ed;
+
+border-bottom:1px solid #343e7855;
+
+}
+
+.logo {
+
+font-size:21px;
+
+font-weight:950;
+
+}
+
+.logo b { color:#a879ff; }
+
+.balance {
+
+border:1px solid #6675c4;
+
+background:linear-gradient(110deg,#203b83,#512c82);
+
+border-radius:30px;
+
+padding:8px 13px;
+
+font-weight:850;
+
+}
+
+main {
+
+max-width:720px;
+
+margin:auto;
+
+padding:15px 13px;
+
+}
+
+.page { display:none; }
+
+.page.active { display:block; }
+
+h1 {
+
+font-size:29px;
+
+line-height:1.13;
+
+}
+
+h2 { font-size:22px; }
+
+h3 { font-size:17px; }
+
+.muted { color:var(--muted); }
+
+.tiny { font-size:12px;color:var(--muted); }
+
+.panel {
+
+background:linear-gradient(145deg,#20264b,#171a35);
+
+border:1px solid #46539a88;
+
+border-radius:25px;
+
+padding:17px;
+
+margin:13px 0;
+
+}
+
+.row {
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+gap:10px;
+
+}
+
+.badge {
+
+background:#332a67;
+
+color:#d9c9ff;
+
+border-radius:20px;
+
+padding:5px 9px;
+
+font-size:11px;
+
+font-weight:800;
+
+}
+
+.chips {
+
+display:flex;
+
+gap:8px;
+
+align-items:center;
+
+flex-wrap:wrap;
+
+}
+
+.chip {
+
+background:#111832;
+
+border:1px solid #ffffff28;
+
+border-radius:25px;
+
+padding:8px 12px;
+
+font-size:13px;
+
+font-weight:800;
+
+}
+
+.game-shell {
+
+min-height:490px;
+
+border-radius:27px;
+
+overflow:hidden;
+
+padding:15px;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:space-between;
+
+background:radial-gradient(ellipse at 45% 28%,#2366a9,#173b80 35%,#101d49 72%,#080d29);
+
+border:1px solid #8494ff66;
+
+}
+
+.game-top,.game-bottom {
+
+position:relative;
+
+z-index:2;
+
+}
+
+.tile-board {
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:7px;
+
+height:330px;
+
+margin:15px 0;
+
+overflow:hidden;
+
+border-radius:18px;
+
+background:#081333;
+
+border:1px solid #9ab7ff55;
+
+touch-action:manipulation;
+
+}
+
+.tile-lane {
+
+position:relative;
+
+border-left:1px solid #ffffff20;
+
+background:linear-gradient(180deg,#14285b,#07132e);
+
+overflow:hidden;
+
+}
+
+.tile-lane:first-child {
+
+border-left:0;
+
+}
+
+.falling-tile {
+
+position:absolute;
+
+left:5px;
+
+right:5px;
+
+height:65px;
+
+top:-75px;
+
+border-radius:10px;
+
+background:linear-gradient(145deg,#35c9ff,#345cff 55%,#9c5cff);
+
+box-shadow:0 0 18px #36aaff88;
+
+border:1px solid #b7e8ff;
+
+animation:fall linear forwards;
+
+}
+
+@keyframes fall {
+
+to { top:110%; }
+
+}
+
+.lane-hit {
+
+position:absolute;
+
+bottom:8px;
+
+left:5px;
+
+right:5px;
+
+height:5px;
+
+border-radius:8px;
+
+background:#7eeaff;
+
+box-shadow:0 0 12px #7eeaff;
+
+}
+
+.game-hint {
+
+color:#dbe8ff;
+
+text-align:center;
+
+font-size:13px;
+
+margin:5px 0;
+
+}
+
+.progress {
+
+height:7px;
+
+background:#ffffff30;
+
+border-radius:20px;
+
+overflow:hidden;
+
+margin:10px 0;
+
+}
+
+.progress i {
+
+display:block;
+
+height:100%;
+
+width:0;
+
+background:linear-gradient(90deg,var(--blue),var(--violet));
+
+transition:width .25s;
+
+}
+
+button {
+
+font:inherit;
+
+cursor:pointer;
+
+}
+
+.primary {
+
+width:100%;
+
+padding:14px 16px;
+
+border:0;
+
+border-radius:16px;
+
+color:white;
+
+font-weight:850;
+
+background:linear-gradient(100deg,#347dff,#8958ef);
+
+}
+
+.primary:disabled {
+
+opacity:.45;
+
+cursor:not-allowed;
+
+}
+
+.secondary {
+
+border:1px solid #5865a4;
+
+background:#252d59;
+
+color:white;
+
+padding:12px 15px;
+
+border-radius:15px;
+
+font-weight:750;
+
+}
+
+.bottom-nav {
+
+position:fixed;
+
+z-index:10;
+
+bottom:9px;
+
+left:10px;
+
+right:10px;
+
+max-width:700px;
+
+margin:auto;
+
+display:grid;
+
+grid-template-columns:repeat(5,1fr);
+
+padding:7px 4px;
+
+border-radius:27px;
+
+background:#101631ed;
+
+border:1px solid #5864a1;
+
+}
+
+.bottom-nav button {
+
+background:transparent;
+
+color:white;
+
+border-radius:19px;
+
+padding:7px 1px;
+
+font-size:11px;
+
+font-weight:750;
+
+}
+
+.bottom-nav button .ico {
+
+display:block;
+
+font-size:22px;
+
+margin-bottom:3px;
+
+}
+
+.bottom-nav button.active {
+
+color:#bca0ff;
+
+background:#30396d;
+
+}
+
+.grid2 {
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:11px;
+
+}
+
+.stat {
+
+border-radius:22px;
+
+padding:16px;
+
+background:linear-gradient(140deg,#22294e,#171a35);
+
+border:1px solid #39477e;
+
+}
+
+.stat strong {
+
+display:block;
+
+color:#a98cff;
+
+font-size:24px;
+
+margin:3px 0;
+
+}
+
+.green { color:var(--green); }
+
+input {
+
+width:100%;
+
+padding:13px;
+
+border-radius:14px;
+
+border:1px solid #46518c;
+
+background:#10152f;
+
+color:white;
+
+font:inherit;
+
+margin:7px 0 13px;
+
+}
+
+.notice {
+
+font-size:12px;
+
+line-height:1.45;
+
+color:#cbd3f3;
+
+background:#111832;
+
+border:1px solid #46518c;
+
+border-radius:14px;
+
+padding:11px;
+
+}
+
+.history {
+
+padding:13px 0;
+
+border-top:1px solid #ffffff1c;
+
+}
+
+.avatar {
+
+width:45px;
+
+height:45px;
+
+border-radius:50%;
+
+display:grid;
+
+place-items:center;
+
+background:linear-gradient(140deg,#498bff,#a36aff);
+
+font-weight:900;
+
+}
+
+.rank {
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+padding:12px 0;
+
+border-bottom:1px solid #ffffff18;
+
+}
+
+[hidden] { display:none!important; }
+
+@media(min-width:600px) {
+
+.game-shell { min-height:610px; }
+
+.tile-board { height:410px; }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">🚀 Quicka<b>Game</b></div>
+
+<div class="balance">💶<span id="headPoints">0</span> pièces</div>
+
+</header>
+
+<main>
+
+<!-- ACCUEIL -->
+
+<section class="page active" id="home">
+
+<div class="row">
+
+<span class="badge">QUICKAGAME</span>
+
+<span class="tiny" id="daily">0 / 14 parties aujourd’hui</span>
+
+</div>
+
+<h1>Joue. Tape. Gagne des pièces.</h1>
+
+<div class="game-shell">
+
+<div class="game-top chips">
+
+<span class="chip">💶 +50 points démo</span>
+
+<span class="chip" id="timer">30 s</span>
+
+<span class="chip">💸 <b id="gameScore">0</b></span>
+
+</div>
+
+<div>
+
+<div class="game-hint" id="gameHint">
+
+Appuie sur Commencer puis tape les tuiles bleues
+
+</div>
+
+<div class="tile-board" id="tileBoard">
+
+<div class="tile-lane">
+
+<i class="lane-hit"></i>
+
+</div>
+
+<div class="tile-lane">
+
+<i class="lane-hit"></i>
+
+</div>
+
+<div class="tile-lane">
+
+<i class="lane-hit"></i>
+
+</div>
+
+<div class="tile-lane">
+
+<i class="lane-hit"></i>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="game-bottom">
+
+<div class="row">
+
+<span class="tiny" id="status">Prêt à jouer</span>
+
+<span class="tiny" id="left">14 parties restantes</span>
+
+</div>
+
+<div class="progress">
+
+<i id="bar"></i>
+
+</div>
+
+<button class="primary" id="watch">
+
+Commencer une partie de 30 secondes
+
+</button>
+
+</div>
+
+</div>
+
+<div class="panel" id="rate" hidden>
+
+<h3>Bien joué !</h3>
+
+<p class="tiny" id="rateText">Partie terminée.</p>
+
+</div>
+
+<div class="grid2">
+
+<div class="stat">
+
+<span class="tiny">Mes pièces</span>
+
+<strong id="homePoints">0</strong>
+
+</div>
+
+<div class="stat">
+
+<span class="tiny">Parties restantes</span>
+
+<strong id="remaining">14</strong>
+
+</div>
+
+</div>
+
+<p class="notice">
+
+Jeu original de démonstration inspiré des jeux de rythme.
+
+Les pièces affichées sont fictives et ne valent pas de l’argent.
+
+</p>
+
+</section>
+
+<!-- INVITATIONS -->
+
+<section class="page" id="invite">
+
+<h1>Invite des amis</h1>
+
+<p class="muted">Partage QuickaGame autour de toi.</p>
+
+<div class="panel">
+
+<h2>Ton lien d'invitation</h2>
+
+<input id="link" readonly value="https://quickagame.github.io/QuickaGame/">
+
+<button class="primary" id="copy">
+
+Copier le lien
+
+</button>
+
+</div>
+
+<div class="grid2">
+
+<div class="stat">
+
+<span class="tiny">Amis invités</span>
+
+<strong>0</strong>
+
+</div>
+
+<div class="stat">
+
+<span class="tiny">Bonus disponible</span>
+
+<strong>—</strong>
+
+</div>
+
+</div>
+
+<p class="notice">
+
+Prototype de démonstration : les pièces et points affichés sont fictifs.
+
+</p>
+
+</section>
+
+<!-- TACHES -->
+
+<section class="page" id="tasks">
+
+<h1>Tâches</h1>
+
+<p class="muted">Tes objectifs du jour.</p>
+
+<div class="panel">
+
+<div class="row">
+
+<h3>Série quotidienne</h3>
+
+<span class="badge">Jour 1</span>
+
+</div>
+
+<p class="muted">Reviens découvrir les nouveautés.</p>
+
+</div>
+
+<div class="panel">
+
+<h3>🎬 Jouer aux tuiles musicales</h3>
+
+<p class="muted">
+
+Joue une partie de 30 secondes et tape les tuiles au bon moment.
+
+</p>
+
+<div class="progress">
+
+<i id="taskBar"></i>
+
+</div>
+
+<span class="tiny" id="taskCount">0 / 14 parties</span>
+
+</div>
+
+</section>
+
+<!-- CLASSEMENT -->
+
+<section class="page" id="top">
+
+<h1>Classement</h1>
+
+<p class="muted">Les membres les plus actifs.</p>
+
+<div class="panel">
+
+<div class="rank">
+
+<div class="avatar">1</div>
+
+<div style="flex:1">
+
+<b>Ton profil</b>
+
+<div class="tiny">Continue à jouer</div>
+
+</div>
+
+<b id="rankPoints">0 pts</b>
+
+</div>
+
+<div class="rank">
+
+<div class="avatar">2</div>
+
+<div style="flex:1">
+
+<b>Membre galaxie</b>
+
+<div class="tiny">Exemple de classement</div>
+
+</div>
+
+<b>—</b>
+
+</div>
+
+<p class="tiny">
+
+Classement d'aperçu. Les scores publics nécessitent un serveur.
+
+</p>
+
+</div>
+
+</section>
+
+<!-- PROFIL -->
+
+<section class="page" id="profile">
+
+<h1>Profil</h1>
+
+<div class="row" style="margin:18px 0">
+
+<div class="avatar">Q</div>
+
+<div style="flex:1">
+
+<b>Mon compte</b>
+
+<div class="tiny">Membre QuickaGame</div>
+
+</div>
+
+<span class="badge">Galaxie</span>
+
+</div>
+
+<div class="grid2">
+
+<div class="stat">
+
+<span class="tiny">Solde de pièces</span>
+
+<strong id="wallet">0</strong>
+
+<span class="tiny">Pièces collectées</span>
+
+</div>
+
+<div class="stat">
+
+<span class="tiny">Seuil de démonstration</span>
+
+<strong>1 800</strong>
+
+<span class="tiny">Points de test</span>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Portefeuille</h2>
+
+<div class="notice">
+
+Prototype de démonstration : les pièces sont des points fictifs.
+
+Aucun compte bancaire, IBAN, paiement ou retrait réel n'est connecté.
+
+</div>
+
+<p class="muted">Progression de test</p>
+
+<div class="progress">
+
+<i id="walletBar"></i>
+
+</div>
+
+<div class="row">
+
+<span class="tiny">Progression</span>
+
+<b id="walletLabel">0 / 1 800 points</b>
+
+</div>
+
+<button class="primary" disabled style="margin-top:15px">
+
+Retrait non disponible
+
+</button>
+
+</div>
+
+<div class="panel">
+
+<h2>Historique des activités</h2>
+
+<div id="history">
+
+<p class="muted">Aucune activité pour le moment.</p>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Paramètres</h2>
+
+<div class="row">
+
+<span>Apparence</span>
+
+<b class="badge">Galaxie bleue & violette</b>
+
+</div>
+
+<button class="secondary" id="reset" style="width:100%;margin-top:14px">
+
+Réinitialiser la démonstration
+
+</button>
+
+</div>
+
+</section>
+
+</main>
+
+<!-- NAVIGATION -->
+
+<nav class="bottom-nav">
+
+<button class="active" data-page="home">
+
+<span class="ico">⌂</span>Accueil
+
+</button>
+
+<button data-page="invite">
+
+<span class="ico">♧</span>Inviter
+
+</button>
+
+<button data-page="tasks">
+
+<span class="ico">☷</span>Tâches
+
+</button>
+
+<button data-page="top">
+
+<span class="ico">🏆</span>Top
+
+</button>
+
+<button data-page="profile">
+
+<span class="ico">♙</span>Profil
+
+</button>
+
+</nav>
+
+<script>
+
+const KEY='qg_galaxy_demo';
+
+const today=()=>new Date().toISOString().slice(0,10);
+
+let d=JSON.parse(localStorage.getItem(KEY)||'null');
+
+if(!d || d.day!==today()) {
+
+d={
+
+day:today(),
+
+points:0,
+
+videos:0,
+
+history:[]
+
+};
+
+}
+
+const el=id=>document.getElementById(id);
+
+const save=()=>{
+
+localStorage.setItem(KEY,JSON.stringify(d));
+
+};
+
+function render(){
+
+['headPoints','homePoints','wallet','rankPoints'].forEach(id=>{
+
+el(id).textContent=id==='rankPoints'
+
+?d.points+' pts'
+
+:d.points;
+
+});
+
+el('daily').textContent=d.videos+' / 14 parties aujourd’hui';
+
+el('remaining').textContent=Math.max(0,14-d.videos);
+
+el('left').textContent=Math.max(0,14-d.videos)+' parties restantes';
+
+el('taskCount').textContent=d.videos+' / 14 parties';
+
+let pct=d.videos/14*100;
+
+el('taskBar').style.width=pct+'%';
+
+el('walletBar').style.width=Math.min(100,d.points/1800*100)+'%';
+
+el('walletLabel').textContent=Math.min(d.points,1800)+' / 1 800 points';
+
+el('history').innerHTML=d.history.length
+
+?d.history.slice().reverse().map(x=>
+
+`<div class="history">
+
+<div class="row">
+
+<b>${x.name}</b>
+
+<b class="green">+${x.points} pièces</b>
+
+</div>
+
+<span class="tiny">${x.date}</span>
+
+</div>`
+
+).join('')
+
+:'<p class="muted">Aucune activité pour le moment.</p>';
+
+el('watch').disabled=d.videos>=14;
+
+save();
+
+}
+
+// NAVIGATION
+
+document.querySelectorAll('.bottom-nav button').forEach(b=>{
+
+b.onclick=()=>{
+
+document.querySelectorAll('.bottom-nav button')
+
+.forEach(x=>x.classList.toggle('active',x===b));
+
+document.querySelectorAll('.page')
+
+.forEach(p=>p.classList.toggle('active',p.id===b.dataset.page));
+
+};
+
+});
+
+// JEU DE TUILES
+
+let gameActive=false;
+
+let gameTimer=null;
+
+let spawnTimer=null;
+
+let secondsLeft=30;
+
+let score=0;
+
+const lanes=[...document.querySelectorAll('.tile-lane')];
+
+function updateGameUI(){
+
+el('timer').textContent=secondsLeft+' s';
+
+el('gameScore').textContent=score;
+
+el('bar').style.width=((30-secondsLeft)/30*100)+'%';
+
+el('daily').textContent=d.videos+' / 14 parties aujourd’hui';
+
+el('remaining').textContent=Math.max(0,14-d.videos);
+
+el('left').textContent=Math.max(0,14-d.videos)+' parties restantes';
+
+}
+
+// FAIRE APPARAITRE LES TUILES
+
+function spawnTile(){
+
+if(!gameActive)return;
+
+const lane=lanes[Math.floor(Math.random()*lanes.length)];
+
+const tile=document.createElement('button');
+
+tile.type='button';
+
+tile.className='falling-tile';
+
+tile.setAttribute('aria-label','Tuile à taper');
+
+const duration=(1.15+Math.random()*0.45)+'s';
+
+tile.style.animationDuration=duration;
+
+tile.addEventListener('click',hitTile);
+
+lane.appendChild(tile);
+
+tile.addEventListener('animationend',()=>{
+
+if(tile.isConnected){
+
+tile.remove();
+
+if(gameActive){
+
+el('gameHint').textContent=
+
+'Essaie de taper les tuiles avant qu’elles disparaissent !';
+
+}
+
+}
+
+});
+
+}
+
+// TOUCHER UNE TUILE
+
+function hitTile(event){
+
+if(!gameActive)return;
+
+event.stopPropagation();
+
+const tile=event.currentTarget;
+
+if(!tile.isConnected)return;
+
+tile.remove();
+
+score++;
+
+el('gameHint').textContent='Bien joué ! Continue !';
+
+el('gameScore').textContent=score;
+
+}
+
+// FIN DE PARTIE
+
+function finishGame(){
+
+gameActive=false;
+
+clearInterval(gameTimer);
+
+clearInterval(spawnTimer);
+
+secondsLeft=0;
+
+lanes.forEach(lane=>{
+
+lane.querySelectorAll('.falling-tile')
+
+.forEach(tile=>tile.remove());
+
+});
+
+d.videos++;
+
+d.points+=50;
+
+d.history.push({
+
+name:'Partie de jeu terminée (30 secondes)',
+
+points:50,
+
+date:new Date().toLocaleString('fr-FR')
+
+});
+
+el('status').textContent='Partie terminée : +50 points fictifs';
+
+el('gameHint').textContent=
+
+'Bravo ! Score : '+score+' tuiles tapées.';
+
+el('watch').textContent='Rejouer 30 secondes';
+
+el('rate').hidden=false;
+
+el('rateText').textContent=
+
+'Tu as tapé '+score+' tuile(s). +50 points de démonstration.';
+
+updateGameUI();
+
+render();
+
+}
+
+// COMMENCER UNE PARTIE
+
+function startGame(){
+
+if(gameActive)return;
+
+if(d.videos>=14){
+
+el('status').textContent=
+
+'Limite de démonstration atteinte aujourd’hui.';
+
+return;
+
+}
+
+gameActive=true;
+
+secondsLeft=30;
+
+score=0;
+
+el('rate').hidden=true;
+
+el('watch').textContent='Partie en cours…';
+
+el('status').textContent='À toi de jouer !';
+
+el('gameHint').textContent=
+
+'Tape les tuiles bleues qui apparaissent dans les colonnes.';
+
+updateGameUI();
+
+spawnTile();
+
+spawnTimer=setInterval(spawnTile,650);
+
+gameTimer=setInterval(()=>{
+
+secondsLeft--;
+
+updateGameUI();
+
+if(secondsLeft<=0){
+
+finishGame();
+
+}
+
+},1000);
+
+}
+
+el('watch').onclick=startGame;
+
+// COPIER LE LIEN
+
+el('copy').onclick=async()=>{
+
+try{
+
+await navigator.clipboard.writeText(el('link').value);
+
+el('copy').textContent='Lien copié !';
+
+}catch(e){
+
+el('link').select();
+
+el('copy').textContent='Copie le lien sélectionné';
+
+}
+
+};
+
+// REINITIALISER
+
+el('reset').onclick=()=>{
+
+if(confirm('Réinitialiser la démonstration ?')){
+
+if(gameActive){
+
+gameActive=false;
+
+clearInterval(gameTimer);
+
+clearInterval(spawnTimer);
+
+}
+
+d={
+
+day:today(),
+
+points:0,
+
+videos:0,
+
+history:[]
+
+};
+
+el('rate').hidden=true;
+
+el('watch').textContent=
+
+'Commencer une partie de 30 secondes';
+
+secondsLeft=30;
+
+score=0;
+
+lanes.forEach(lane=>{
+
+lane.querySelectorAll('.falling-tile')
+
+.forEach(tile=>tile.remove());
+
+});
+
+updateGameUI();
+
+render();
+
+}
+
+};
+
+updateGameUI();
+
+render();
+
+</script>
+
+</body>
+
+</html>
